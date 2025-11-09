@@ -1,5 +1,5 @@
 %option noyywrap
-
+%option yylineno 
 %{
 #include <stdio.h>
 #include <string.h>
@@ -7,9 +7,9 @@
 /* Output files */
 FILE *tokenFile;
 FILE *errorFile;
-int lineno = 1;
+
 void print_token(const char *token_name, const char *lexeme) {
-    fprintf(tokenFile, "<%d, %s, %s>\n", lineno, token_name, lexeme);
+    fprintf(tokenFile, "<%d, %s, %s>\n", yylineno, token_name, lexeme);
 }
 
 void print_error(const char *lexeme) {
@@ -98,15 +98,13 @@ int main(int argc, char *argv[]) {
     yyin = inputFile;
 
     /* Analyze the input ; */
-    while(yylex() != 0){
-    lineno++;
-    };
+    while(yylex() != 0);
     
 
     fclose(inputFile);
     fclose(tokenFile);
     fclose(errorFile);
 
-    printf("Lexical analysis completed!\nTokens -> tokens.txt\nErrors -> errors.txt\n");
+    printf("DONE!!\n");
     return 0;
 }
