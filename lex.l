@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Output files */
 FILE *tokenFile;
 FILE *errorFile;
 
@@ -75,14 +74,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    /* Open input file */
     FILE *inputFile = fopen(argv[1], "r");
     if(!inputFile) {
         perror("Error opening input file");
         return 1;
     }
 
-    /* Open output files */
     tokenFile = fopen("tokens.txt", "w");
     if(!tokenFile) {
         perror("Cannot create tokens.txt");
@@ -97,7 +94,6 @@ int main(int argc, char *argv[]) {
 
     yyin = inputFile;
 
-    /* Analyze the input ; */
     while(yylex() != 0);
     
 

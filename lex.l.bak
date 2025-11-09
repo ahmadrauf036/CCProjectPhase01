@@ -1,0 +1,110 @@
+%option noyywrap
+%option yylineno 
+%{
+#include <stdio.h>
+#include <string.h>
+
+/* Output files */
+FILE *tokenFile;
+FILE *errorFile;
+
+void print_token(const char *token_name, const char *lexeme) {
+    fprintf(tokenFile, "<%d, %s, %s>\n", yylineno, token_name, lexeme);
+}
+
+void print_error(const char *lexeme) {
+    fprintf(errorFile, "Unknown token: %s\n", lexeme);
+}
+%}
+
+WHITESPACE      [ \t\r\n]+
+COMMENT_SL      "//".*
+COMMENT_ML      "/*"([^*]|\*+[^*/])*\*+"/"
+IDENT           [a-zA-Z_][a-zA-Z0-9_]*
+FLOAT           [0-9]*\.[0-9]+
+INT             [0-9]+
+STRING          \"([^\\\"]|\\.)*\"
+
+%%
+
+{WHITESPACE}                   
+{COMMENT_SL}                  
+{COMMENT_ML}                  
+
+"number"                        { print_token("NUMBER", yytext); return 1; }
+"decimal"                       { print_token("DECIMAL", yytext); return 2; }
+"check"                         { print_token("CHECK", yytext); return 3; }
+"otherwise"                     { print_token("OTHERWISE", yytext); return 4; }
+"until"                         { print_token("UNTIL", yytext); return 5; }
+"keepup"                        { print_token("KEEPUP", yytext); return 6; }
+"done"                          { print_token("DONE", yytext); return 7; }
+"skip"                          { print_token("SKIP", yytext); return 8; }
+"getback"                       { print_token("GETBACK", yytext); return 9; }
+"nothing"                       { print_token("NOTHING", yytext); return 10; }
+"fact"                          { print_token("FACTS", yytext); return 11; }
+"lie"                           { print_token("LIE", yytext); return 12; }
+"word"                          { print_token("WORD", yytext); return 13; }
+"ghosted"                       { print_token("GHOST", yytext); return 14; }
+"getout"                        { print_token("OUT", yytext); return 15; }
+"getin"                         { print_token("IN", yytext); return 16; }
+
+"isSame"                        { print_token("SAMEAS", yytext); return 17; } /* '==' */
+"is"                            { print_token("IS", yytext); return 18; }     /* assignment */
+
+";"                             { print_token("SEMI", yytext); return 19; }
+"{"                             { print_token("LBRACE", yytext); return 20; }
+"}"                             { print_token("RBRACE", yytext); return 21; }
+"("                             { print_token("LPAREN", yytext); return 22; }
+")"                             { print_token("RPAREN", yytext); return 23; }
+
+"+"                             { print_token("PLUS", yytext); return 24; }
+"-"                             { print_token("MINUS", yytext); return 25; }
+
+{FLOAT}                         { print_token("FLOAT", yytext); return 26; }
+{INT}                           { print_token("INTEGER", yytext); return 27; }
+{STRING}                        { print_token("STRING", yytext); return 28; }
+
+{IDENT}                         { print_token("IDENTIFIER", yytext); return 29; }
+
+.                               { print_error(yytext); }
+%%
+
+int main(int argc, char *argv[]) {
+    if(argc < 2) {
+        printf("Usage: lexer <source_file>\n");
+        return 1;
+    }
+
+    /* Open input file */
+    FILE *inputFile = fopen(argv[1], "r");
+    if(!inputFile) {
+        perror("Error opening input file");
+        return 1;
+    }
+
+    /* Open output files */
+    tokenFile = fopen("tokens.txt", "w");
+    if(!tokenFile) {
+        perror("Cannot create tokens.txt");
+        return 1;
+    }
+
+    errorFile = fopen("errors.txt", "w");
+    if(!errorFile) {
+        perror("Cannot create errors.txt");
+        return 1;
+    }
+
+    yyin = inputFile;
+
+    /* Analyze the input ; */
+    while(yylex() != 0);
+    
+
+    fclose(inputFile);
+    fclose(tokenFile);
+    fclose(errorFile);
+
+    printf("DONE!!\n");
+    return 0;
+}
