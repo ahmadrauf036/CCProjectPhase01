@@ -1,0 +1,21 @@
+number x is 10;
+decimal y is 3.14;
+check x isSame 10 done
+check y isSame 3.14 done
+getin z;
+z is 5;
+skip z;
+getback x;
+nothing;
+fact x;
+lie y;
+word "Hello World";
+ghosted x;
+getout y;
+until x isSame y keepup done
+otherwise z is 0 done
+number a is 100;
+decimal b is 2.718;
+check a isSame 100 done
+check b isSame 2.718 done
+number c is 2*8
